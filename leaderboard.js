@@ -1,14 +1,14 @@
-// Globals are here
+ // Globals are here
 PlayersList = new Mongo.Collection('players');
 
 if (Meteor.isClient) {
     // this code only runs in the client
-
+    Meteor.subscribe('thePlayers');
     // code for Template Leaderboard Helpers (functions etc)
     Template.leaderboard.helpers({
         'player': function() {
             var currentUserId = Meteor.userId();
-            return PlayersList.find({createdBy : currentUserId}, {sort: {score: -1,name: 1}});
+            return PlayersList.find({}, {sort: {score: -1,name: 1}});
         },
         
         'selectedClass': function() {
@@ -34,7 +34,7 @@ if (Meteor.isClient) {
             return PlayersList.findOne(selectedPlayer);
         }
     });
-    
+
     // Code for TEMPLATE LEADERBOARD EVENTS!!!
     Template.leaderboard.events({
         // events go here
@@ -54,30 +54,30 @@ if (Meteor.isClient) {
             var selectedPlayer = Session.get('selectedPlayer');
             PlayersList.update(selectedPlayer, {$inc: {score: -5}});
         },
-
-        'click .remove': function(){
+        
+        'click .remove': function() {
             var selectedPlayer = Session.get('selectedPlayer');
             PlayersList.remove(selectedPlayer);
-
-
+        
+        
         }
     
     });
 
     // Code for TEMPLATE ADDPLAYERFORM EVENTS
     Template.addPlayerForm.events({
-       'submit form': function(event){
-           event.preventDefault();
-           var playerNameVar = event.target.playerName.value;
-           var currentUserId = Meteor.userId(); 
-
-           console.log(playerNameVar);
-           PlayersList.insert({
-              name: playerNameVar,
-              score: 0,
-              createdBy : currentUserId 
-           });
-       } 
+        'submit form': function(event) {
+            event.preventDefault();
+            var playerNameVar = event.target.playerName.value;
+            var currentUserId = Meteor.userId();
+            
+            console.log(playerNameVar);
+            PlayersList.insert({
+                name: playerNameVar,
+                score: 0,
+                createdBy: currentUserId
+            });
+        }
     });
 }
 
@@ -85,15 +85,10 @@ if (Meteor.isClient) {
 
 
 if (Meteor.isServer) {
-    // this codeo nly runs on the server
-    
-    if (PlayersList.find().count() == null) {
-        PlayersList.insert({name: 'David',score: 0});
-        PlayersList.insert({name: 'John',score: 0});
-        PlayersList.insert({name: 'Allen',score: 0});
-        PlayersList.insert({name: 'Kevin',score: 0});
-        PlayersList.insert({name: 'Jason',score: 0});
-        PlayersList.insert({name: 'Luigi',score: 0});
-    }
+    Meteor.publish('thePlayers',function(){
+        // inside the publish function
+        var currentUserId = this.userId;
+        return PlayersList.find({createdBy:currentUserId});
+    });
 
 }
