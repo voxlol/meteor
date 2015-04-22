@@ -44,20 +44,18 @@ if (Meteor.isClient) {
         },
         
         'click .increment': function() {
-            // code goes here
             var selectedPlayer = Session.get('selectedPlayer');
-            PlayersList.update(selectedPlayer, {$inc: {score: 5}});
+            Meteor.call('modifyPlayerScore',selectedPlayer,5);
         },
         
         'click .decrement': function() {
-            // code goes here
             var selectedPlayer = Session.get('selectedPlayer');
-            PlayersList.update(selectedPlayer, {$inc: {score: -5}});
+            Meteor.call('modifyPlayerScore',selectedPlayer,-5);
         },
         
         'click .remove': function() {
             var selectedPlayer = Session.get('selectedPlayer');
-            PlayersList.remove(selectedPlayer);
+            Meteor.call('removePlayerData', selectedPlayer)
         
         
         }
@@ -69,14 +67,7 @@ if (Meteor.isClient) {
         'submit form': function(event) {
             event.preventDefault();
             var playerNameVar = event.target.playerName.value;
-            var currentUserId = Meteor.userId();
-            
-            console.log(playerNameVar);
-            PlayersList.insert({
-                name: playerNameVar,
-                score: 0,
-                createdBy: currentUserId
-            });
+            Meteor.call('insertPlayerData', playerNameVar);
         }
     });
 }
@@ -91,4 +82,24 @@ if (Meteor.isServer) {
         return PlayersList.find({createdBy:currentUserId});
     });
 
+
+    Meteor.methods({
+        'insertPlayerData': function(playerNameVar){
+            var currentUserId = Meteor.userId();
+
+            PlayersList.insert({
+               name: playerNameVar,
+               score:0,
+               createdBy: currentUserId 
+            });
+        },
+
+        'removePlayerData': function(selectedPlayer){
+            PlayersList.remove(selectedPlayer);
+        },
+
+        'modifyPlayerScore': function(selectedPlayer,scoreValue){
+            PlayersList.update(selectedPlayer,{$inc: {score:scoreValue}});
+        }
+    });
 }
