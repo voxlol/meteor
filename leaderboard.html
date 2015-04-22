@@ -21,5 +21,16 @@
 	<input type ="button" class="decrement" value="Take 5 Points" />
 	<p>{{otherHelperFunction}}</p>
 	<p> Total Players : {{count}}</p>
+
+
+	{{ >addPlayerForm}}
+	<input type="button" class="remove" value="Remove Player" />
 </template>
 	
+<template name="addPlayerForm">
+	<form>
+		<input type="text" name="playerName">
+		<input type="submit" value="Add Player">
+	</form>
+</template>
+

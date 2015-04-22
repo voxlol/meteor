@@ -1,7 +1,10 @@
+// Globals are here
 PlayersList = new Mongo.Collection('players');
 
 if (Meteor.isClient) {
     // this code only runs in the client
+
+    // code for Template Leaderboard Helpers (functions etc)
     Template.leaderboard.helpers({
         'player': function() {
             return PlayersList.find({}, {sort: {score: -1,name: 1}});
@@ -31,6 +34,7 @@ if (Meteor.isClient) {
         }
     });
     
+    // Code for TEMPLATE LEADERBOARD EVENTS!!!
     Template.leaderboard.events({
         // events go here
         'click .player': function() {
@@ -48,9 +52,29 @@ if (Meteor.isClient) {
             // code goes here
             var selectedPlayer = Session.get('selectedPlayer');
             PlayersList.update(selectedPlayer, {$inc: {score: -5}});
+        },
+
+        'click .remove': function(){
+            var selectedPlayer = Session.get('selectedPlayer');
+            PlayersList.remove(selectedPlayer);
+
+
         }
     
-    })
+    });
+
+    // Code for TEMPLATE ADDPLAYERFORM EVENTS
+    Template.addPlayerForm.events({
+       'submit form': function(event){
+           event.preventDefault();
+           var playerNameVar = event.target.playerName.value;
+           console.log(playerNameVar);
+           PlayersList.insert({
+              name: playerNameVar,
+              score: 0  
+           });
+       } 
+    });
 }
 
 
